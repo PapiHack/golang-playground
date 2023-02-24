@@ -19,7 +19,7 @@ func main() {
 	fmt.Println("Making a post request")
 	PerformPostJsonRequest(myPostURL)
 	fmt.Println("==========================")
-	fmt.Println("Making a post form request")
+	fmt.Println("Making a post request with FormData")
 	PerformPostFormRequest(myPostFormURL)
 }
 
