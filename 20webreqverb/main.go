@@ -8,22 +8,21 @@ import (
 	"strings"
 )
 
-const myGetURL = "http://localhost:8000/get"
-const myPostURL = "http://localhost:8000/post"
-const myPostFormURL = "http://localhost:8000/postform"
+const baseURL = "http://localhost:8000/"
 
 func main() {
 	fmt.Println("Welcome to web verb video !")
-	PerformGetRequest(myGetURL)
+	PerformGetRequest("get")
 	fmt.Println("==========================")
 	fmt.Println("Making a post request")
-	PerformPostJsonRequest(myPostURL)
+	PerformPostJsonRequest("post")
 	fmt.Println("==========================")
 	fmt.Println("Making a post request with FormData")
-	PerformPostFormRequest(myPostFormURL)
+	PerformPostFormRequest("postform")
 }
 
-func PerformGetRequest(url string)  {
+func PerformGetRequest(path string)  {
+	var url = baseURL + path
 	response, err := http.Get(url)
 
 	if err != nil {
@@ -48,7 +47,8 @@ func PerformGetRequest(url string)  {
 	// fmt.Println(string(content))
 }
 
-func PerformPostJsonRequest(url string)  {
+func PerformPostJsonRequest(path string)  {
+	var url = baseURL + path
 	// Let's create a fake payload here
 	requestPayload := strings.NewReader(`{
 		"coursename": "Let's learn Golang",
@@ -74,7 +74,8 @@ func PerformPostJsonRequest(url string)  {
 	
 }
 
-func PerformPostFormRequest(hostURL string) {
+func PerformPostFormRequest(path string) {
+	var hostURL = baseURL + path
 	// Creating the FormData
 	data := url.Values{}
 	data.Add("firstname", "Elliot")
