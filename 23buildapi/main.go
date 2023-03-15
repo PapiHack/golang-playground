@@ -1,5 +1,11 @@
 package main
 
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
+
 // Model for course - file
 
 type Course struct {
@@ -24,4 +30,17 @@ func (course *Course) IsEmpty() bool {
 
 func main() {
 	
+}
+
+// Controllers - file
+
+// Serve home route
+func serveHome(writer http.ResponseWriter, request *http.Request) {
+	writer.Write([]byte("<h1>Welcome to API powered by LearnCodeOnline!</h1>"))
+}
+
+func getAllCourses(writer http.ResponseWriter, request *http.Request) {
+	fmt.Println("GET ALL COURSES")
+	writer.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(writer).Encode(courses)
 }
