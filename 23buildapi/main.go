@@ -85,3 +85,51 @@ func createOneCourse(writer http.ResponseWriter, request *http.Request) {
 	courses = append(courses, course)
 	json.NewEncoder(writer).Encode(course)
 }
+
+func updateOneCourse(writer http.ResponseWriter, request *http.Request) {
+	fmt.Println("UPDATE ONE COURSE")
+	writer.Header().Set("Content-Type", "application/json")
+
+	if request.Body == nil {
+		json.NewEncoder(writer).Encode("Please send some data.")
+	}
+
+	params := mux.Vars(request)
+	for index, course := range courses {
+		if course.Id == params["id"] {
+			courses = append(courses[:index], courses[index+1:]...)
+			var updatedCourse Course
+			json.NewDecoder(request.Body).Decode(&updatedCourse)
+			updatedCourse.Id = params["id"]
+			courses = append(courses, updatedCourse)
+			json.NewEncoder(writer).Encode(updatedCourse)
+		}
+	}
+
+	json.NewEncoder(writer).Encode("No course found with id.")
+	
+}
+
+func deleteOneCourse(writer http.ResponseWriter, request *http.Request) {
+	fmt.Println("DELETE ONE COURSE")
+	writer.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(request)
+	for index, course := range courses {
+		if course.Id == params["id"] {
+			courses = append(courses[:index], courses[index+1:]...)
+			json.NewEncoder(writer).Encode("Course with id #" + course.Id + " was deleted.")
+			break
+		}
+	}
+
+	json.NewEncoder(writer).Encode("No course found with id.")
+}
+
+func deleteAllCourse(writer http.ResponseWriter, request *http.Request) {
+	fmt.Println("DELETE ALL COURSES")
+	writer.Header().Set("Content-Type", "application/json")
+	courses = []Course{}
+
+	json.NewEncoder(writer).Encode("All course was deleted.")
+}
