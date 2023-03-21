@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -10,13 +11,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const PORT = 4000
+
 // Model for course - file
 
 type Course struct {
 	Id string `json:"id"`
 	Name string `json:"name"`
-	Price string `json:"price"`
-	Author *Author
+	Price int `json:"price"`
+	Author *Author `json:"author"`
 }
 
 type Author struct {
@@ -34,7 +37,42 @@ func (course *Course) IsEmpty() bool {
 }
 
 func main() {
-	
+	fmt.Println("API - LearnCodeOnline.in")
+	fmt.Printf("Server listening on port %v...\n", PORT)
+
+	router := mux.NewRouter()
+
+	// Seeding our fake DB
+	courses = append(courses, Course{
+		Id: "2", 
+		Name: "ReactJS",
+		Price: 299,
+		Author: &Author{
+			Fullname: "Papi MBAYE",
+			Website: "lco.dev",
+		},
+	})
+	courses = append(courses, Course{
+		Id: "4", 
+		Name: "MERN",
+		Price: 199,
+		Author: &Author{
+			Fullname: "Papi MBAYE",
+			Website: "go.dev",
+		},
+	})
+
+	// Handle routing
+	router.HandleFunc("/", serveHome).Methods("GET")
+	router.HandleFunc("/courses", getAllCourses).Methods("GET")
+	router.HandleFunc("/courses/{id}", getOneCourse).Methods("GET")
+	router.HandleFunc("/courses", createOneCourse).Methods("POST")
+	router.HandleFunc("/courses/{id}", deleteOneCourse).Methods("DELETE")
+	router.HandleFunc("/courses/{id}", updateOneCourse).Methods("PUT")
+	router.HandleFunc("/courses", deleteAllCourse).Methods("DELETE")
+
+	// Listening to a port
+	log.Fatal(http.ListenAndServe(":" + strconv.Itoa(PORT), router))
 }
 
 // Controllers - file
@@ -61,6 +99,7 @@ func getOneCourse(writer http.ResponseWriter, request *http.Request) {
 	for _, course := range courses {
 		if course.Id == params["id"] {
 			json.NewEncoder(writer).Encode(course)
+			return
 		}
 	}
 	json.NewEncoder(writer).Encode("No Course found with id.")
@@ -74,16 +113,26 @@ func createOneCourse(writer http.ResponseWriter, request *http.Request) {
 		json.NewEncoder(writer).Encode("Please send some data.")
 	}
 	
-	var course Course
-	_ = json.NewDecoder(request.Body).Decode(&course)
-	if course.IsEmpty() {
+	var newCourse Course
+	_ = json.NewDecoder(request.Body).Decode(&newCourse)
+	if newCourse.IsEmpty() {
 		json.NewEncoder(writer).Encode("No data inside the JSON.")
+		return
+	}
+
+	// TODO: check if course name already exist
+
+	for _, course := range courses {
+		if course.Name == newCourse.Name {
+			json.NewEncoder(writer).Encode("Course name '" + newCourse.Name + "' already exist.")
+			return
+		}
 	}
 	
 	rand.NewSource(int64(rand.Intn(100)))
-	course.Id = strconv.Itoa(rand.Intn(100))
-	courses = append(courses, course)
-	json.NewEncoder(writer).Encode(course)
+	newCourse.Id = strconv.Itoa(rand.Intn(100))
+	courses = append(courses, newCourse)
+	json.NewEncoder(writer).Encode(newCourse)
 }
 
 func updateOneCourse(writer http.ResponseWriter, request *http.Request) {
@@ -92,6 +141,7 @@ func updateOneCourse(writer http.ResponseWriter, request *http.Request) {
 
 	if request.Body == nil {
 		json.NewEncoder(writer).Encode("Please send some data.")
+		return
 	}
 
 	params := mux.Vars(request)
@@ -103,6 +153,7 @@ func updateOneCourse(writer http.ResponseWriter, request *http.Request) {
 			updatedCourse.Id = params["id"]
 			courses = append(courses, updatedCourse)
 			json.NewEncoder(writer).Encode(updatedCourse)
+			return
 		}
 	}
 
@@ -119,7 +170,7 @@ func deleteOneCourse(writer http.ResponseWriter, request *http.Request) {
 		if course.Id == params["id"] {
 			courses = append(courses[:index], courses[index+1:]...)
 			json.NewEncoder(writer).Encode("Course with id #" + course.Id + " was deleted.")
-			break
+			return
 		}
 	}
 
