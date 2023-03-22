@@ -110,11 +110,33 @@ func getAllMovies() []primitive.M {
 	return movies
 }
 
+func getOneMovie(movieId string) model.Netflix {
+	id, err := primitive.ObjectIDFromHex(movieId)
+	var movie model.Netflix
+	if err != nil {
+		log.Fatal(err)
+	}
+	filter := bson.M{"_id": id}
+	result := collection.FindOne(context.Background(), filter)
+	_ = result.Decode(&movie)
+	fmt.Println("[*] Get Movie of Id:", movieId)
+	return movie
+}
+
 func FindAllMovies(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/x-www-form-urlencode")
 	w.Header().Set("Allow-Control-Allow-Methods", "GET")
 	allMovies := getAllMovies()
 	json.NewEncoder(w).Encode(allMovies)
+}
+
+func FindOneMovie(w http.ResponseWriter, r *http.Request)  {
+	w.Header().Set("Content-Type", "application/x-www-form-urlencode")
+	w.Header().Set("Allow-Control-Allow-Methods", "GET")
+	
+	params := mux.Vars(r)
+	movie := getOneMovie(params["id"])
+	json.NewEncoder(w).Encode(movie) 
 }
 
 func CreateMovie(w http.ResponseWriter, r *http.Request) {
