@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/papihack/mongoapi/model"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -27,9 +28,20 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("[*] MongoDB connection success")
+	fmt.Println("[*] MongoDB connection success.")
 
 	collection = client.Database(databaseName).Collection(collectionName)
 
-	fmt.Println("[*] Collection reference/instance is ready")
+	fmt.Println("[*] Collection reference/instance is ready.")
+}
+
+// MongoDB helpers - file
+
+func insertOneMovie(movie model.Netflix) {
+	result, err := collection.InsertOne(context.Background(), movie)
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("[*] Inserted 1 movie in DB with id:", result.InsertedID)
 }
