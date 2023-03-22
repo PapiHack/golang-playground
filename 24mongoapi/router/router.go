@@ -5,7 +5,7 @@ import (
 	"github.com/papihack/mongoapi/controller"
 )
 
-func router() *mux.Router {
+func Router() *mux.Router {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/api/movies", controller.FindAllMovies).Methods("GET")
