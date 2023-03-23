@@ -14,7 +14,7 @@ func main() {
 
 	var score = []int{0}
 
-	waitGroup.Add(3) // We can pass directly the total number of WG
+	waitGroup.Add(4) // We can pass directly the total number of WG
 	go func (wg *sync.WaitGroup, m *sync.RWMutex) {
 		fmt.Println("One R")
 		m.Lock()

@@ -26,4 +26,5 @@ use (
 	./23buildapi
 	./24mongoapi
 	./25goroutines
+	./27channels
 )
