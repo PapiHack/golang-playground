@@ -59,6 +59,7 @@ func DeleteAllMovie(collection *mongo.Collection) int64 {
 }
 
 func GetAllMovies(collection *mongo.Collection) []primitive.M {
+	fmt.Println("[*] Get All Movie")
 	cursor, err := collection.Find(context.Background(), bson.D{{}})
 	
 	if err != nil {
@@ -80,6 +81,7 @@ func GetAllMovies(collection *mongo.Collection) []primitive.M {
 }
 
 func GetOneMovie(collection *mongo.Collection, movieId string) model.Netflix {
+	fmt.Println("[*] Get Movie of Id: #", movieId)
 	id, err := primitive.ObjectIDFromHex(movieId)
 	var movie model.Netflix
 	if err != nil {
